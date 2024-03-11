@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Number Names</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            background-color: #91d3f4;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        h2 {
+            color: #ffffff;
+            text-shadow: 2px 2px 0px #7a7a7a;
+        }
+        .number-name {
+            cursor: pointer;
+            margin: 10px;
+            display: inline-block;
+            background-color: #fab1a0;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 4px 4px 0 #d35400;
+            font-size: 24px;
+            color: #2d3436;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .number-name:hover, .number-name:focus {
+            background-color: #ffeaa7;
+            transform: scale(1.1);
+        }
+        @media (max-width: 768px) {
+            .number-name {
+                padding: 30px;
+                font-size: 30px;
+                margin: 15px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h2>Click on a Number Name or Number!</h2>
+    <div id="number-names">
+        <div class="number-name" onclick="toggleNumberName(this, 'one')">One</div>
+        <div class="number-name" onclick="toggleNumberName(this, 'two')">Two</div>
+        <div class="number-name" onclick="toggleNumberName(this, 'three')">Three</div>
+        <div class="number-name" onclick="toggleNumberName(this, 'four')">Four</div>
+        <div class="number-name" onclick="toggleNumberName(this, 'five')">Five</div>
+        <div class="number-name" onclick="toggleNumberName(this, 'six')">Six</div>
+        <div class="number-name" onclick="toggleNumberName(this, 'seven')">Seven</div>
+        <div class="number-name" onclick="toggleNumberName(this, 'eight')">Eight</div>
+        <div class="number-name" onclick="toggleNumberName(this, 'nine')">Nine</div>
+        <div class="number-name" onclick="toggleNumberName(this, 'ten')">Ten</div>
+        <!-- Add more numbers as needed -->
+    </div>
+
+    <script>
+        const numberNamesMap = {
+            one: 1,
+            two: 2,
+            three: 3,
+            four: 4,
+            five: 5,
+            six: 6,
+            seven: 7,
+            eight: 8,
+            nine: 9,
+            ten: 10,
+            // Reverse mappings
+            1: 'one',
+            2: 'two',
+            3: 'three',
+            4: 'four',
+            5: 'five',
+            6: 'six',
+            7: 'seven',
+            8: 'eight',
+            9: 'nine',
+            10: 'ten'
+        };
+
+        function toggleNumberName(element, nameOrNumber) {
+            const currentText = element.textContent.toLowerCase();
+            element.textContent = numberNamesMap[currentText];
+        }
+    </script>
+</body>
+</html>
