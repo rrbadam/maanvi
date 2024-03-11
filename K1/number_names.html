@@ -16,10 +16,17 @@
             color: #ffffff;
             text-shadow: 2px 2px 0px #7a7a7a;
         }
+        #number-names {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center; /* Center the items */
+            max-width: 600px; /* Adjust based on preference */
+            margin: auto; /* Center the container */
+        }
         .number-name {
             cursor: pointer;
             margin: 10px;
-            display: inline-block;
+            flex: 0 1 calc(50% - 20px); /* Adjust for 2 items per row, accounting for margin */
             background-color: #fab1a0;
             padding: 20px;
             border-radius: 10px;
@@ -36,28 +43,28 @@
             .number-name {
                 padding: 30px;
                 font-size: 30px;
-                margin: 15px 0;
+                flex: 0 1 calc(50% - 20px); /* Ensure 2 items per row on smaller screens */
             }
         }
     </style>
 </head>
 <body>
-    <h2>Click on a Number Name or Number!</h2>
-    <div id="number-names">
-        <div class="number-name" onclick="toggleNumberName(this, 'one')">One</div>
-        <div class="number-name" onclick="toggleNumberName(this, 'two')">Two</div>
-        <div class="number-name" onclick="toggleNumberName(this, 'three')">Three</div>
-        <div class="number-name" onclick="toggleNumberName(this, 'four')">Four</div>
-        <div class="number-name" onclick="toggleNumberName(this, 'five')">Five</div>
-        <div class="number-name" onclick="toggleNumberName(this, 'six')">Six</div>
-        <div class="number-name" onclick="toggleNumberName(this, 'seven')">Seven</div>
-        <div class="number-name" onclick="toggleNumberName(this, 'eight')">Eight</div>
-        <div class="number-name" onclick="toggleNumberName(this, 'nine')">Nine</div>
-        <div class="number-name" onclick="toggleNumberName(this, 'ten')">Ten</div>
-        <!-- Add more numbers as needed -->
-    </div>
+<h2>Click on a Number Name or Number!</h2>
+<div id="number-names">
+    <div class="number-name" onclick="toggleNumberName(this, 'one')">One</div>
+    <div class="number-name" onclick="toggleNumberName(this, 'two')">Two</div>
+    <div class="number-name" onclick="toggleNumberName(this, 'three')">Three</div>
+    <div class="number-name" onclick="toggleNumberName(this, 'four')">Four</div>
+    <div class="number-name" onclick="toggleNumberName(this, 'five')">Five</div>
+    <div class="number-name" onclick="toggleNumberName(this, 'six')">Six</div>
+    <div class="number-name" onclick="toggleNumberName(this, 'seven')">Seven</div>
+    <div class="number-name" onclick="toggleNumberName(this, 'eight')">Eight</div>
+    <div class="number-name" onclick="toggleNumberName(this, 'nine')">Nine</div>
+    <div class="number-name" onclick="toggleNumberName(this, 'ten')">Ten</div>
+    <!-- Add more numbers as needed -->
+</div>
 
-    <script>
+<script>
         const numberNamesMap = {
             one: 1,
             two: 2,
