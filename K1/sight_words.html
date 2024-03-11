@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sight Words Soundboard</title>
-<style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sight Words Soundboard</title>
+    <style>
     body {
       font-family: 'Comic Sans MS', 'Arial', sans-serif;
       background-color: #91d3f4;
@@ -52,32 +52,34 @@
         flex: 0 1 calc(33.333% - 20px);
       }
     }
-  </style>
-  
+
+    </style>
+
 </head>
 <body>
 <h2>Click on a word to hear its sound:</h2>
 <div id="words">
-  <div class="word" onclick="playSound('only')">only</div>
-  <div class="word" onclick="playSound('why')">why</div>
-  <div class="word" onclick="playSound('who')">who</div>
-  <div class="word" onclick="playSound('saw')">saw</div>
-  <div class="word" onclick="playSound('any')">any</div>
-  <div class="word" onclick="playSound('put')">put</div>
-  <div class="word" onclick="playSound('two')">two</div>
-  <div class="word" onclick="playSound('said')">said</div>
-  <div class="word" onclick="playSound('some')">some</div>
-  <div class="word" onclick="playSound('what')">what</div>
-  <div class="word" onclick="playSound('when')">when</div>
-  <div class="word" onclick="playSound('whom')">whom</div>
-  <div class="word" onclick="playSound('you')">your</div>
+    <div class="word" onclick="playSound('only')">only</div>
+    <div class="word" onclick="playSound('why')">why</div>
+    <div class="word" onclick="playSound('who')">who</div>
+    <div class="word" onclick="playSound('saw')">saw</div>
+    <div class="word" onclick="playSound('any')">any</div>
+    <div class="word" onclick="playSound('put')">put</div>
+    <div class="word" onclick="playSound('two')">two</div>
+    <div class="word" onclick="playSound('said')">said</div>
+    <div class="word" onclick="playSound('some')">some</div>
+    <div class="word" onclick="playSound('what')">what</div>
+    <div class="word" onclick="playSound('when')">when</div>
+    <div class="word" onclick="playSound('whom')">whom</div>
+    <div class="word" onclick="playSound('you')">your</div>
 </div>
 
 <script>
   function playSound(word) {
-    var audio = new Audio('https://ssl.gstatic.com/dictionary/static/sounds/20220808/'+word+'--_us_1.mp3');
-    audio.play();
+            const msg = new SpeechSynthesisUtterance(word);
+            window.speechSynthesis.speak(msg);
   }
+
 </script>
 </body>
 </html>
