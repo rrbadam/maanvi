@@ -75,11 +75,28 @@
 </div>
 
 <script>
-  function playSound(word) {
-            const msg = new SpeechSynthesisUtterance(word);
-            window.speechSynthesis.speak(msg);
-  }
 
+
+        let indianVoice = null;
+
+        function setIndianVoice() {
+            const voices = window.speechSynthesis.getVoices();
+            indianVoice = voices.find(voice => voice.lang === 'en-IN');
+        }
+
+        function playSound(word) {
+            // Ensure the voices are loaded
+            if (!indianVoice) setIndianVoice();
+
+            const msg = new SpeechSynthesisUtterance(word);
+            if (indianVoice) msg.voice = indianVoice;
+            window.speechSynthesis.speak(msg);
+        }
+
+        // It may be necessary to wait for the voices to be loaded
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = setIndianVoice;
+        }
 </script>
 </body>
 </html>
