@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Speech</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            font-size: 20px;
+            width: 80%;
+            margin: 20px auto;
+            padding: 15px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            line-height: 1.6;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<h1>Maanvika Speech</h1>
+<p id="text"></p>
+<br>
+<button onclick="speakText()">Read Aloud</button>
+
+<script>
+    let words = [];
+    let wordIndex = 0;
+    let speech;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const textContent = `Dear parents, teachers and friends,<br><br>
+
+        Hello everyone. <br><br>
+
+        I am Maanvika from Kindergarten 2 and I am happy to welcome you to our moving-up Ceremony.<br><br>
+
+        First of all, I would like to thank my mamma and pappa for all the love and support they have given me.<br><br>
+
+        We surely had good memories here despite the limited time. We have learned a lot and for that, we thank our loving teacher Aruna mam for making our Kindergarten years so precious.`;
+
+        const textElement = document.getElementById("text");
+        words = textContent.split(/(\s+|<br>|<br\/?>)/g).filter(word => word.trim() !== "<br>" && word.trim() !== "<br/>"); // Preserve spaces but remove BR tags from reading
+
+        textElement.innerHTML = words.map((word, index) => {
+            return `<span onclick="startFromWord(${index})">${word}</span>`;
+        }).join(" ").replace(/(<br>|<br\/?>)/g, "<br>");
+    });
+
+    function speakText() {
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+        }
+
+        const textElement = document.getElementById("text");
+        const spans = textElement.getElementsByTagName("span");
+
+        speech = new SpeechSynthesisUtterance();
+        const voices = window.speechSynthesis.getVoices();
+        speech.voice = voices.find(voice => voice.name.includes("India") && voice.name.toLowerCase().includes("female")) || voices[0];
+        speech.rate = 0.8; // Adjust for better synchronization
+        speech.text = words.slice(wordIndex).join(" ");
+
+        speech.onboundary = function(event) {
+            if (event.name === "word") {
+                if (wordIndex > 0) spans[wordIndex - 1].classList.remove("highlight");
+                if (wordIndex < spans.length) spans[wordIndex].classList.add("highlight");
+                wordIndex++;
+            }
+        };
+
+        speech.onend = function() {
+            for (const span of spans) {
+                span.classList.remove("highlight");
+            }
+            wordIndex = 0;
+        };
+
+        window.speechSynthesis.speak(speech);
+    }
+
+    function startFromWord(index) {
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+        }
+        wordIndex = index;
+        speakText();
+    }
+</script>
+</body>
+</html>
