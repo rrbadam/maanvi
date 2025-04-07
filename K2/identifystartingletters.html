@@ -40,111 +40,170 @@
       margin-top: 2rem;
       font-size: 1.2rem;
     }
+    #feedback {
+      margin-top: 2rem;
+      font-size: 1.1rem;
+    }
+    .results {
+      margin-top: 2rem;
+      text-align: center;
+    }
+    table {
+      margin: auto;
+      width: 90%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+    th {
+      background-color: #eee;
+    }
   </style>
 </head>
 <body>
 
-  <h1>🔤 What Letter Does It Start With?</h1>
-  <p>Listen to the word and choose the correct starting letter</p>
+<h1>🔤 What Letter Does It Start With?</h1>
+<p>Listen to the word and choose the correct starting letter</p>
 
-  <div id="options"></div>
+<div id="options"></div>
 
-  <div class="buttons">
-    <button onclick="replaySound()">🔊 Replay Sound</button>
-    <button onclick="nextWord()">⏭️ Next Word</button>
-  </div>
+<div class="buttons">
+  <button onclick="replaySound()">🔊 Replay Sound</button>
+  <button onclick="nextWord()">⏭️ Next Word</button>
+</div>
 
-  <div id="scoreboard">
-    ✅ Correct: <span id="correct">0</span> |
-    ❌ Wrong: <span id="wrong">0</span>
-  </div>
+<div id="scoreboard">
+  ✅ Correct: <span id="correct">0</span> |
+  ❌ Wrong: <span id="wrong">0</span>
+</div>
 
-  <script>
-    const words = ["apple", "banana", "cat", "dog", "elephant", "fish", "goat", "hat", "ice", "jungle", "kite", "lion", "monkey", "nest", "orange", "pencil", "queen", "rabbit", "sun", "tiger", "umbrella", "violin", "whale", "xylophone", "yogurt", "zebra", "airplane", "ball", "car", "doll", "egg", "frog", "guitar", "house", "igloo", "juice", "kangaroo", "lamp", "mountain", "notebook", "ocean", "penguin", "quilt", "rainbow", "star", "train", "unicorn", "vase", "window", "x-ray", "yacht", "zipper", "ant", "bread", "chair", "desk", "engine", "flower", "garden", "helicopter", "island", "jacket", "key", "ladder", "mirror", "newspaper", "octopus", "pizza", "quokka", "rocket", "snake", "table", "umbrella", "volcano", "watermelon", "xylophone", "yo-yo", "zoo", "alligator", "basket", "candle", "drum", "elephant", "feather", "globe", "hamburger", "ice cream", "jellyfish", "koala", "lemon", "motorcycle", "necklace", "ostrich", "parrot", "quartz", "reindeer", "ship", "telephone", "ukulele", "vulture", "wheel", "xenon", "yak", "zeppelin", "anchor", "beach", "cloud", "dolphin", "earth", "fire", "giraffe", "honey", "igloo", "jungle", "kangaroo", "lighthouse", "mountain", "night", "ocean", "piano", "quiver", "river", "sunflower", "tornado", "uniform", "village", "waterfall", "xylophone", "yogurt", "zeppelin", "astronaut", "bicycle", "compass", "diamond", "engineer", "forest", "galaxy", "helicopter", "internet", "jigsaw", "kayak", "library", "museum", "notebook", "orchestra", "passport", "quasar", "robot", "satellite", "telescope", "universe", "volleyball", "wizard", "xylophonist", "yacht", "zookeeper", "artist", "builder", "chef", "doctor", "explorer", "farmer", "gardener", "hunter", "inventor", "journalist", "king", "lawyer", "mechanic", "nurse", "officer", "pilot", "queen", "ranger", "scientist", "teacher", "umpire", "veterinarian", "writer", "x-ray technician", "yoga instructor", "zoologist", "apron", "brush", "comb", "duster", "eraser", "fork", "glue", "hammer", "ink", "jug", "knife", "ladle", "mop", "needle", "oven", "pan", "quilt", "ruler", "scissors", "tongs", "umbrella", "vase", "whisk", "xylophone", "yarn", "zipper", "acorn", "blossom", "cactus", "dew", "elm", "fern", "grass", "hibiscus", "ivy", "jasmine", "kudzu", "lily", "moss", "nectar", "oak", "petal", "quince", "rose", "stem", "tree", "undergrowth", "vine", "willow", "xerophyte", "yucca", "zinnia", "ankle", "back", "cheek", "dimples", "elbow", "fingers", "gums", "hair", "iris", "joints", "knuckles", "lungs", "muscles", "nails", "organs", "palm", "quads", "ribs", "skin", "toes", "uvula", "veins", "waist", "xiphoid", "yolk sac", "zygote", "arch", "bridge", "castle", "dam", "elevator", "fence", "gate", "highway", "igloo", "jetty", "kiln", "lighthouse", "monument", "navy base", "observatory", "pier", "quay", "railway", "stadium", "tower", "underpass", "viaduct", "wall", "xystus", "yard", "ziggurat", "aardvark", "beaver", "camel", "dingo", "emu", "falcon", "gazelle", "hedgehog", "ibex", "jackal", "kiwi", "lemur", "meerkat", "narwhal", "ocelot", "platypus", "quail", "raccoon", "sloth", "tapir", "urchin", "viper", "walrus", "xerus", "yak", "zebu", "accordion", "banjo", "clarinet", "drum", "euphonium", "flute", "guitar", "harp", "instrument", "jaw harp", "kazoo", "lyre", "mandolin", "nose flute", "oboe", "piano", "quena", "recorder", "saxophone", "tambourine", "ukulele", "violin", "whistle", "xylophone", "yueqin", "zither", "almond", "bread", "cheese", "donut", "eclair", "fudge", "grape", "honeydew", "iceberg lettuce", "jelly", "kale", "lasagna", "muffin", "noodle", "oatmeal", "pancake", "quesadilla", "raisin", "salad", "toast", "udon", "vanilla", "waffle", "xigua", "yams", "zucchini", "airport", "bakery", "cinema", "diner", "embassy", "farm", "garage", "hospital", "inn", "jail", "kindergarten", "library", "market", "nursery", "office", "post office", "quarry", "restaurant", "school", "theater", "university", "villa", "warehouse", "xenodochium", "youth hostel", "zoo", "alley", "boulevard", "crosswalk"];
-    let correctLetter = '';
-    let currentWord = '';
-    let indianVoice = null;
-    let correctCount = 0;
-    let wrongCount = 0;
+<div id="feedback"></div>
 
-    function loadVoices() {
-      const voices = speechSynthesis.getVoices();
-      indianVoice = voices.find(voice =>
-        voice.lang.includes('en-IN') || voice.name.toLowerCase().includes('india')
-      );
+<div class="results">
+  <h3>📋 Answer Summary</h3>
+  <table>
+    <thead>
+    <tr>
+      <th>Word</th>
+      <th>Correct Letter</th>
+      <th>Selected Letter</th>
+      <th>Result</th>
+    </tr>
+    </thead>
+    <tbody id="answerTableBody"></tbody>
+  </table>
+</div>
+
+<script>
+  const words = ["apple", "banana", "cat", "dog", "elephant", "fish", "goat", "hat", "ice", "jungle", "kite", "lion", "monkey", "nest", "orange", "pencil", "queen", "rabbit", "sun", "tiger", "umbrella", "violin", "whale", "xylophone", "yogurt", "zebra", "airplane", "ball", "car", "doll", "egg", "frog", "guitar", "house", "igloo", "juice", "kangaroo", "lamp", "mountain", "notebook", "ocean", "penguin", "quilt", "rainbow", "star", "train", "unicorn", "vase", "window", "x-ray", "yacht", "zipper", "ant", "bread", "chair", "desk", "engine", "flower", "garden", "helicopter", "island", "jacket", "key", "ladder", "mirror", "newspaper", "octopus", "pizza", "quokka", "rocket", "snake", "table", "umbrella", "volcano", "watermelon", "xylophone", "yo-yo", "zoo", "alligator", "basket", "candle", "drum", "elephant", "feather", "globe", "hamburger", "ice cream", "jellyfish", "koala", "lemon", "motorcycle", "necklace", "ostrich", "parrot", "quartz", "reindeer", "ship", "telephone", "ukulele", "vulture", "wheel", "xenon", "yak", "zeppelin", "anchor", "beach", "cloud", "dolphin", "earth", "fire", "giraffe", "honey", "igloo", "jungle", "kangaroo", "lighthouse", "mountain", "night", "ocean", "piano", "quiver", "river", "sunflower", "tornado", "uniform", "village", "waterfall", "xylophone", "yogurt", "zeppelin", "astronaut", "bicycle", "compass", "diamond", "engineer", "forest", "galaxy", "helicopter", "internet", "jigsaw", "kayak", "library", "museum", "notebook", "orchestra", "passport", "quasar", "robot", "satellite", "telescope", "universe", "volleyball", "wizard", "xylophonist", "yacht", "zookeeper", "artist", "builder", "chef", "doctor", "explorer", "farmer", "gardener", "hunter", "inventor", "journalist", "king", "lawyer", "mechanic", "nurse", "officer", "pilot", "queen", "ranger", "scientist", "teacher", "umpire", "veterinarian", "writer", "x-ray technician", "yoga instructor", "zoologist", "apron", "brush", "comb", "duster", "eraser", "fork", "glue", "hammer", "ink", "jug", "knife", "ladle", "mop", "needle", "oven", "pan", "quilt", "ruler", "scissors", "tongs", "umbrella", "vase", "whisk", "xylophone", "yarn", "zipper", "acorn", "blossom", "cactus", "dew", "elm", "fern", "grass", "hibiscus", "ivy", "jasmine", "kudzu", "lily", "moss", "nectar", "oak", "petal", "quince", "rose", "stem", "tree", "undergrowth", "vine", "willow", "xerophyte", "yucca", "zinnia", "ankle", "back", "cheek", "dimples", "elbow", "fingers", "gums", "hair", "iris", "joints", "knuckles", "lungs", "muscles", "nails", "organs", "palm", "quads", "ribs", "skin", "toes", "uvula", "veins", "waist", "xiphoid", "yolk sac", "zygote", "arch", "bridge", "castle", "dam", "elevator", "fence", "gate", "highway", "igloo", "jetty", "kiln", "lighthouse", "monument", "navy base", "observatory", "pier", "quay", "railway", "stadium", "tower", "underpass", "viaduct", "wall", "xystus", "yard", "ziggurat", "aardvark", "beaver", "camel", "dingo", "emu", "falcon", "gazelle", "hedgehog", "ibex", "jackal", "kiwi", "lemur", "meerkat", "narwhal", "ocelot", "platypus", "quail", "raccoon", "sloth", "tapir", "urchin", "viper", "walrus", "xerus", "yak", "zebu", "accordion", "banjo", "clarinet", "drum", "euphonium", "flute", "guitar", "harp", "instrument", "jaw harp", "kazoo", "lyre", "mandolin", "nose flute", "oboe", "piano", "quena", "recorder", "saxophone", "tambourine", "ukulele", "violin", "whistle", "xylophone", "yueqin", "zither", "almond", "bread", "cheese", "donut", "eclair", "fudge", "grape", "honeydew", "iceberg lettuce", "jelly", "kale", "lasagna", "muffin", "noodle", "oatmeal", "pancake", "quesadilla", "raisin", "salad", "toast", "udon", "vanilla", "waffle", "xigua", "yams", "zucchini", "airport", "bakery", "cinema", "diner", "embassy", "farm", "garage", "hospital", "inn", "jail", "kindergarten", "library", "market", "nursery", "office", "post office", "quarry", "restaurant", "school", "theater", "university", "villa", "warehouse", "xenodochium", "youth hostel", "zoo", "alley", "boulevard", "crosswalk"];
+  let correctLetter = '';
+  let currentWord = '';
+  let indianVoice = null;
+  let correctCount = 0;
+  let wrongCount = 0;
+
+  function loadVoices() {
+    const voices = speechSynthesis.getVoices();
+    indianVoice = voices.find(voice =>
+      voice.lang.includes('en-IN') || voice.name.toLowerCase().includes('india')
+    );
+  }
+
+  speechSynthesis.onvoiceschanged = loadVoices;
+
+  function speakWord(word) {
+    const utterance = new SpeechSynthesisUtterance(word);
+    utterance.rate = 0.7;
+    if (indianVoice) {
+      utterance.voice = indianVoice;
+    }
+    speechSynthesis.speak(utterance);
+  }
+
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+
+  function updateScore() {
+    document.getElementById('correct').textContent = correctCount;
+    document.getElementById('wrong').textContent = wrongCount;
+  }
+
+  function showResult(isCorrect, selected, actual) {
+    const feedback = document.getElementById('feedback');
+    feedback.innerHTML = `
+      <p>You selected: <strong>${selected.toUpperCase()}</strong></p>
+      <p>Correct answer: <strong>${actual.toUpperCase()}</strong></p>
+    `;
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${currentWord}</td>
+      <td style="text-align: center;">${actual.toUpperCase()}</td>
+      <td style="text-align: center;">${selected.toUpperCase()}</td>
+      <td style="text-align: center; color: ${isCorrect ? 'green' : 'red'};">
+        ${isCorrect ? '✅ Correct' : '❌ Wrong'}
+      </td>
+    `;
+    document.getElementById('answerTableBody').appendChild(row);
+  }
+
+  function nextWord() {
+    document.getElementById('options').innerHTML = '';
+    document.getElementById('feedback').innerHTML = '';
+
+    currentWord = words[Math.floor(Math.random() * words.length)];
+    correctLetter = currentWord[0].toLowerCase();
+
+    speakWord(currentWord);
+
+    const allLetters = new Set([correctLetter]);
+    while (allLetters.size < 4) {
+      const randLetter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
+      allLetters.add(randLetter);
     }
 
-    speechSynthesis.onvoiceschanged = loadVoices;
+    const options = Array.from(allLetters);
+    shuffle(options);
 
-    function speakWord(word) {
-      const utterance = new SpeechSynthesisUtterance(word);
-      utterance.rate = 0.7;
-      if (indianVoice) {
-        utterance.voice = indianVoice;
-      }
-      speechSynthesis.speak(utterance);
-    }
+    const container = document.getElementById('options');
+    options.forEach(letter => {
+      const btn = document.createElement('div');
+      btn.className = 'option';
+      btn.innerText = letter.toUpperCase();
+      btn.onclick = function () {
+        const isCorrect = letter === correctLetter;
+        btn.classList.add(isCorrect ? 'correct' : 'wrong');
 
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-    }
+        if (isCorrect) {
+          correctCount++;
+        } else {
+          wrongCount++;
+        }
 
-    function updateScore() {
-      document.getElementById('correct').textContent = correctCount;
-      document.getElementById('wrong').textContent = wrongCount;
-    }
+        updateScore();
+        showResult(isCorrect, letter, correctLetter);
 
-    function nextWord() {
-      document.getElementById('options').innerHTML = '';
+        document.querySelectorAll('.option').forEach(b => b.onclick = null);
+      };
+      container.appendChild(btn);
+    });
+  }
 
-      currentWord = words[Math.floor(Math.random() * words.length)];
-      correctLetter = currentWord[0].toLowerCase();
+  function replaySound() {
+    speakWord(currentWord);
+  }
 
-      speakWord(currentWord);
-
-      const allLetters = new Set([correctLetter]);
-      while (allLetters.size < 4) {
-        const randLetter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
-        allLetters.add(randLetter);
-      }
-
-      const options = Array.from(allLetters);
-      shuffle(options);
-
-      const container = document.getElementById('options');
-      options.forEach(letter => {
-        const btn = document.createElement('div');
-        btn.className = 'option';
-        btn.innerText = letter.toUpperCase();
-        btn.onclick = function () {
-          if (letter === correctLetter) {
-            btn.classList.add('correct');
-            correctCount++;
-          } else {
-            btn.classList.add('wrong');
-            wrongCount++;
-          }
-
-          updateScore();
-
-          // Disable further clicks
-          document.querySelectorAll('.option').forEach(b => b.onclick = null);
-        };
-        container.appendChild(btn);
-      });
-    }
-
-    function replaySound() {
-      speakWord(currentWord);
-    }
-
-    window.onload = () => {
-      loadVoices();
-      setTimeout(() => nextWord(), 300);
-    };
-  </script>
+  window.onload = () => {
+    loadVoices();
+    setTimeout(() => nextWord(), 300);
+  };
+</script>
 </body>
 </html>
