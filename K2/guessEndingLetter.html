@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Guess Ending Letter</title>
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          padding: 2rem;
+          text-align: center;
+          overflow-x: hidden;
+        }
+        .option {
+          display: inline-block;
+          margin: 1rem;
+          padding: 1rem 2rem;
+          font-size: 2rem;
+          cursor: pointer;
+          border: 2px solid #ccc;
+          border-radius: 10px;
+          transition: background 0.3s;
+        }
+        .correct {
+          background-color: #c8f7c5;
+          border-color: green;
+        }
+        .wrong {
+          background-color: #f7c5c5;
+          border-color: red;
+        }
+        .buttons {
+          margin-top: 2rem;
+        }
+        button {
+          margin: 0.5rem;
+          padding: 1rem 2rem;
+          font-size: 1rem;
+          cursor: pointer;
+        }
+        #scoreboard {
+          margin-top: 2rem;
+          font-size: 1.2rem;
+        }
+        #feedback {
+          margin-top: 2rem;
+          font-size: 1.3rem;
+          font-weight: bold;
+        }
+        .results {
+          margin-top: 2rem;
+          text-align: center;
+        }
+        table {
+          margin: auto;
+          width: 90%;
+          border-collapse: collapse;
+          margin-top: 1rem;
+        }
+        th, td {
+          padding: 10px;
+          border: 1px solid #ccc;
+        }
+        th {
+          background-color: #eee;
+        }
+
+        .blast {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          font-size: 3rem;
+          color: gold;
+          animation: explode 0.7s ease-out forwards;
+          pointer-events: none;
+          z-index: 9999;
+        }
+
+        @keyframes explode {
+          0% {
+            transform: translate(-50%, -50%) scale(0.2);
+            opacity: 1;
+          }
+          100% {
+            transform: translate(-50%, -50%) scale(2.5);
+            opacity: 0;
+          }
+        }
+    </style>
+</head>
+<body>
+
+<h1>🔤 What Letter Does It End With?</h1>
+<p>Listen to the word and choose the correct ending letter</p>
+
+<div id="options"></div>
+
+<div class="buttons">
+    <button onclick="replaySound()">🔊 Replay Sound</button>
+    <button onclick="nextWord()">⏭️ Next Word</button>
+</div>
+
+<div id="scoreboard">
+    ✅ Correct: <span id="correct">0</span> |
+    ❌ Wrong: <span id="wrong">0</span>
+</div>
+
+<div id="feedback"></div>
+
+<div class="results">
+    <h3>📋 Answer Summary</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Word</th>
+            <th>Correct Letter</th>
+            <th>Selected Letter</th>
+            <th>Result</th>
+        </tr>
+        </thead>
+        <tbody id="answerTableBody"></tbody>
+    </table>
+</div>
+
+<script>
+    const words = ["apple", "banana", "hat", "zebra", "lamp", "queen", "rocket", "river", "drum", "star"];
+    let correctLetter = '';
+    let currentWord = '';
+    let indianVoice = null;
+    let correctCount = 0;
+    let wrongCount = 0;
+
+    function loadVoices() {
+      const voices = speechSynthesis.getVoices();
+      indianVoice = voices.find(voice =>
+        voice.lang.includes('en-IN') || voice.name.toLowerCase().includes('india')
+      );
+    }
+
+    speechSynthesis.onvoiceschanged = loadVoices;
+
+    function speak(text, rate = 1) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = rate;
+      if (indianVoice) {
+        utterance.voice = indianVoice;
+      }
+      speechSynthesis.speak(utterance);
+    }
+
+    function speakWord(word) {
+      speak(word, 0.7);
+    }
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function updateScore() {
+      document.getElementById('correct').textContent = correctCount;
+      document.getElementById('wrong').textContent = wrongCount;
+    }
+
+    function showBlastAnimation(message, color = "gold") {
+      const blast = document.createElement('div');
+      blast.className = 'blast';
+      blast.style.color = color;
+      blast.textContent = message;
+      document.body.appendChild(blast);
+      setTimeout(() => blast.remove(), 700);
+    }
+
+    function showResult(isCorrect, selected, actual) {
+      const feedback = document.getElementById('feedback');
+      feedback.style.color = isCorrect ? 'green' : 'red';
+
+      if (isCorrect) {
+        feedback.textContent = '🎉 Hurray! You did it!';
+        speak("Hurray! You did it!", 1.1);
+        showBlastAnimation('💥');
+      } else {
+        feedback.textContent = '😞 Alas! You lost.';
+        speak("Alas! You lost.", 1.0);
+      }
+
+      setTimeout(() => {
+        feedback.textContent = '';
+      }, 2000);
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${currentWord.toUpperCase()}</td>
+        <td style="text-align: center;">${actual.toUpperCase()}</td>
+        <td style="text-align: center;">${selected.toUpperCase()}</td>
+        <td style="text-align: center; color: ${isCorrect ? 'green' : 'red'};">
+          ${isCorrect ? '✅ Correct' : '❌ Wrong'}
+        </td>
+      `;
+      document.getElementById('answerTableBody').prepend(row);
+    }
+
+    function nextWord() {
+      document.getElementById('options').innerHTML = '';
+      document.getElementById('feedback').innerHTML = '';
+
+      currentWord = words[Math.floor(Math.random() * words.length)];
+      correctLetter = currentWord[currentWord.length - 1].toLowerCase();
+
+      speakWord(currentWord);
+
+      const allLetters = new Set([correctLetter]);
+      while (allLetters.size < 4) {
+        const randLetter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
+        allLetters.add(randLetter);
+      }
+
+      const options = Array.from(allLetters);
+      shuffle(options);
+
+      const container = document.getElementById('options');
+      options.forEach(letter => {
+        const btn = document.createElement('div');
+        btn.className = 'option';
+        btn.innerText = letter.toUpperCase();
+        btn.onclick = function () {
+          const isCorrect = letter === correctLetter;
+          btn.classList.add(isCorrect ? 'correct' : 'wrong');
+
+          if (isCorrect) {
+            correctCount++;
+          } else {
+            wrongCount++;
+          }
+
+          updateScore();
+          showResult(isCorrect, letter, correctLetter);
+
+          document.querySelectorAll('.option').forEach(b => b.onclick = null);
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function replaySound() {
+      speakWord(currentWord);
+    }
+
+    window.onload = () => {
+      loadVoices();
+      setTimeout(() => nextWord(), 300);
+    };
+</script>
+
+</body>
+</html>
