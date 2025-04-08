@@ -192,7 +192,7 @@
 
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td>${currentWord}</td>
+      <td>${currentWord.toUpperCase()}</td>
       <td style="text-align: center;">${actual.toUpperCase()}</td>
       <td style="text-align: center;">${selected.toUpperCase()}</td>
       <td style="text-align: center; color: ${isCorrect ? 'green' : 'red'};">
