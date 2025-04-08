@@ -8,6 +8,7 @@
       font-family: Arial, sans-serif;
       padding: 2rem;
       text-align: center;
+      overflow-x: hidden;
     }
     .option {
       display: inline-block;
@@ -42,7 +43,8 @@
     }
     #feedback {
       margin-top: 2rem;
-      font-size: 1.1rem;
+      font-size: 1.3rem;
+      font-weight: bold;
     }
     .results {
       margin-top: 2rem;
@@ -60,6 +62,30 @@
     }
     th {
       background-color: #eee;
+    }
+
+    /* Blast Animation */
+    .blast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3rem;
+      color: gold;
+      animation: explode 0.7s ease-out forwards;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    @keyframes explode {
+      0% {
+        transform: translate(-50%, -50%) scale(0.2);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(2.5);
+        opacity: 0;
+      }
     }
   </style>
 </head>
@@ -96,7 +122,6 @@
     <tbody id="answerTableBody"></tbody>
   </table>
 </div>
-
 <script>
   const words = ["apple", "banana", "cat", "dog", "elephant", "fish", "goat", "hat", "ice", "jungle", "kite", "lion", "monkey", "nest", "orange", "pencil", "queen", "rabbit", "sun", "tiger", "umbrella", "violin", "whale", "xylophone", "yogurt", "zebra", "airplane", "ball", "car", "doll", "egg", "frog", "guitar", "house", "igloo", "juice", "kangaroo", "lamp", "mountain", "notebook", "ocean", "penguin", "quilt", "rainbow", "star", "train", "unicorn", "vase", "window", "x-ray", "yacht", "zipper", "ant", "bread", "chair", "desk", "engine", "flower", "garden", "helicopter", "island", "jacket", "key", "ladder", "mirror", "newspaper", "octopus", "pizza", "quokka", "rocket", "snake", "table", "umbrella", "volcano", "watermelon", "xylophone", "yo-yo", "zoo", "alligator", "basket", "candle", "drum", "elephant", "feather", "globe", "hamburger", "ice cream", "jellyfish", "koala", "lemon", "motorcycle", "necklace", "ostrich", "parrot", "quartz", "reindeer", "ship", "telephone", "ukulele", "vulture", "wheel", "xenon", "yak", "zeppelin", "anchor", "beach", "cloud", "dolphin", "earth", "fire", "giraffe", "honey", "igloo", "jungle", "kangaroo", "lighthouse", "mountain", "night", "ocean", "piano", "quiver", "river", "sunflower", "tornado", "uniform", "village", "waterfall", "xylophone", "yogurt", "zeppelin", "astronaut", "bicycle", "compass", "diamond", "engineer", "forest", "galaxy", "helicopter", "internet", "jigsaw", "kayak", "library", "museum", "notebook", "orchestra", "passport", "quasar", "robot", "satellite", "telescope", "universe", "volleyball", "wizard", "xylophonist", "yacht", "zookeeper", "artist", "builder", "chef", "doctor", "explorer", "farmer", "gardener", "hunter", "inventor", "journalist", "king", "lawyer", "mechanic", "nurse", "officer", "pilot", "queen", "ranger", "scientist", "teacher", "umpire", "veterinarian", "writer", "x-ray technician", "yoga instructor", "zoologist", "apron", "brush", "comb", "duster", "eraser", "fork", "glue", "hammer", "ink", "jug", "knife", "ladle", "mop", "needle", "oven", "pan", "quilt", "ruler", "scissors", "tongs", "umbrella", "vase", "whisk", "xylophone", "yarn", "zipper", "acorn", "blossom", "cactus", "dew", "elm", "fern", "grass", "hibiscus", "ivy", "jasmine", "kudzu", "lily", "moss", "nectar", "oak", "petal", "quince", "rose", "stem", "tree", "undergrowth", "vine", "willow", "xerophyte", "yucca", "zinnia", "ankle", "back", "cheek", "dimples", "elbow", "fingers", "gums", "hair", "iris", "joints", "knuckles", "lungs", "muscles", "nails", "organs", "palm", "quads", "ribs", "skin", "toes", "uvula", "veins", "waist", "xiphoid", "yolk sac", "zygote", "arch", "bridge", "castle", "dam", "elevator", "fence", "gate", "highway", "igloo", "jetty", "kiln", "lighthouse", "monument", "navy base", "observatory", "pier", "quay", "railway", "stadium", "tower", "underpass", "viaduct", "wall", "xystus", "yard", "ziggurat", "aardvark", "beaver", "camel", "dingo", "emu", "falcon", "gazelle", "hedgehog", "ibex", "jackal", "kiwi", "lemur", "meerkat", "narwhal", "ocelot", "platypus", "quail", "raccoon", "sloth", "tapir", "urchin", "viper", "walrus", "xerus", "yak", "zebu", "accordion", "banjo", "clarinet", "drum", "euphonium", "flute", "guitar", "harp", "instrument", "jaw harp", "kazoo", "lyre", "mandolin", "nose flute", "oboe", "piano", "quena", "recorder", "saxophone", "tambourine", "ukulele", "violin", "whistle", "xylophone", "yueqin", "zither", "almond", "bread", "cheese", "donut", "eclair", "fudge", "grape", "honeydew", "iceberg lettuce", "jelly", "kale", "lasagna", "muffin", "noodle", "oatmeal", "pancake", "quesadilla", "raisin", "salad", "toast", "udon", "vanilla", "waffle", "xigua", "yams", "zucchini", "airport", "bakery", "cinema", "diner", "embassy", "farm", "garage", "hospital", "inn", "jail", "kindergarten", "library", "market", "nursery", "office", "post office", "quarry", "restaurant", "school", "theater", "university", "villa", "warehouse", "xenodochium", "youth hostel", "zoo", "alley", "boulevard", "crosswalk"];
   let correctLetter = '';
@@ -114,13 +139,17 @@
 
   speechSynthesis.onvoiceschanged = loadVoices;
 
-  function speakWord(word) {
-    const utterance = new SpeechSynthesisUtterance(word);
-    utterance.rate = 0.7;
+  function speak(text, rate = 1) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = rate;
     if (indianVoice) {
       utterance.voice = indianVoice;
     }
     speechSynthesis.speak(utterance);
+  }
+
+  function speakWord(word) {
+    speak(word, 0.7);
   }
 
   function shuffle(array) {
@@ -135,12 +164,31 @@
     document.getElementById('wrong').textContent = wrongCount;
   }
 
+  function showBlastAnimation(message, color = "gold") {
+    const blast = document.createElement('div');
+    blast.className = 'blast';
+    blast.style.color = color;
+    blast.textContent = message;
+    document.body.appendChild(blast);
+    setTimeout(() => blast.remove(), 700);
+  }
+
   function showResult(isCorrect, selected, actual) {
     const feedback = document.getElementById('feedback');
-    feedback.innerHTML = `
-      <p>You selected: <strong>${selected.toUpperCase()}</strong></p>
-      <p>Correct answer: <strong>${actual.toUpperCase()}</strong></p>
-    `;
+    feedback.style.color = isCorrect ? 'green' : 'red';
+
+    if (isCorrect) {
+      feedback.textContent = '🎉 Hurray! You did it!';
+      speak("Hurray! You did it!", 1.1);
+      showBlastAnimation('💥');
+    } else {
+      feedback.textContent = '😞 Alas! You lost.';
+      speak("Alas! You lost.", 1.0);
+    }
+
+    setTimeout(() => {
+      feedback.textContent = '';
+    }, 2000);
 
     const row = document.createElement('tr');
     row.innerHTML = `
@@ -151,7 +199,7 @@
         ${isCorrect ? '✅ Correct' : '❌ Wrong'}
       </td>
     `;
-    document.getElementById('answerTableBody').appendChild(row);
+    document.getElementById('answerTableBody').prepend(row);
   }
 
   function nextWord() {
