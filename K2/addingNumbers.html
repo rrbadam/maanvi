@@ -115,8 +115,8 @@
 
       num1Row.innerHTML += `<input type="text" disabled value="${n1}">`;
       num2Row.innerHTML += `<input type="text" disabled value="${n2}">`;
-      answerRow.innerHTML += `<input type="text" id="ans-${i}" maxlength="1">`;
-      carryRow.innerHTML += `<input type="text" id="carry-${i}" maxlength="1">`;
+      answerRow.innerHTML += `<input type="number" inputmode="numeric" pattern="[0-9]*" id="ans-${i}" maxlength="1">`;
+      carryRow.innerHTML += `<input type="number" inputmode="numeric" pattern="[0-9]*" id="carry-${i}" maxlength="1">`;
     }
   }
 
