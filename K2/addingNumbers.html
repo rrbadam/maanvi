@@ -135,6 +135,7 @@
     const len = Math.max(num1.length, num2.length);
     const totalDigits = len + 1;
     let correctAnswer = [];
+    let carryArray = [];
 
     for (let i = totalDigits - 1; i >= 0; i--) {
       const n1 = num1[num1.length - 1 - (totalDigits - 1 - i)] || 0;
@@ -145,6 +146,7 @@
       carry = Math.floor(expected / 10);
 
       correctAnswer.unshift(expectedDigit);
+      carryArray.unshift(carry);
     }
 
     // Skip leading zeros in validation
@@ -166,6 +168,12 @@
       if (isNaN(userDigit) || userDigit !== expectedDigit) {
         correct = false;
       }
+    }
+
+    // Fill carry inputs
+    for (let i = 0; i < totalDigits; i++) {
+      const carryInput = document.getElementById(`carry-${i}`);
+      carryInput.value = i === totalDigits - 1 ? '' : carryArray[i + 1] || '';
     }
 
     document.getElementById('result').innerText = correct ? '✅ Correct!' : '❌ Try Again!';
