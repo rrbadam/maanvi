@@ -61,112 +61,118 @@
   </style>
 </head>
 <body>
-  <h1>Addition Practice (Up to 4-Digits)</h1>
-  <div class="problem-container">
-    <div class="digit-row" id="carry-row"></div>
-    <div class="digit-row">
-      <span class="operator">+</span>
-      <div id="num1-row" class="digit-row"></div>
-    </div>
-    <div class="digit-row">
-      <span class="operator"> </span>
-      <div id="num2-row" class="digit-row"></div>
-    </div>
-    <hr />
-    <div class="digit-row">
-      <span class="operator">=</span>
-      <div id="answer-row" class="digit-row"></div>
-    </div>
-    <button class="check-button" onclick="checkAnswer()">Check Answer</button>
-    <button class="new-button" onclick="generateProblem()">New Problem</button>
-    <div class="result" id="result"></div>
-    <div class="full-answer" id="full-answer"></div>
+<h1>Addition Practice (Up to 4-Digits)</h1>
+<div class="problem-container">
+  <div class="digit-row" id="carry-row"></div>
+  <div class="digit-row">
+    <span class="operator">+</span>
+    <div id="num1-row" class="digit-row"></div>
   </div>
+  <div class="digit-row">
+    <span class="operator"> </span>
+    <div id="num2-row" class="digit-row"></div>
+  </div>
+  <hr />
+  <div class="digit-row">
+    <span class="operator">=</span>
+    <div id="answer-row" class="digit-row"></div>
+  </div>
+  <button class="check-button" onclick="checkAnswer()">Check Answer</button>
+  <button class="new-button" onclick="generateProblem()">New Problem</button>
+  <div class="result" id="result"></div>
+  <div class="full-answer" id="full-answer"></div>
+</div>
 
-  <script>
-    let num1 = [];
-    let num2 = [];
+<script>
+  let num1 = [];
+  let num2 = [];
 
-    function generateDigits(length) {
-      const arr = [];
-      for (let i = 0; i < length; i++) {
-        arr.push(Math.floor(Math.random() * 10));
-      }
-      return arr;
+  function generateDigits(length) {
+    const arr = [];
+    for (let i = 0; i < length; i++) {
+      arr.push(Math.floor(Math.random() * 10));
+    }
+    return arr;
+  }
+
+  function displayProblem() {
+    const len = Math.max(num1.length, num2.length);
+    const answerLen = len + 1;
+
+    const num1Row = document.getElementById('num1-row');
+    const num2Row = document.getElementById('num2-row');
+    const answerRow = document.getElementById('answer-row');
+    const carryRow = document.getElementById('carry-row');
+
+    num1Row.innerHTML = '';
+    num2Row.innerHTML = '';
+    answerRow.innerHTML = '';
+    carryRow.innerHTML = '';
+
+    for (let i = 0; i < answerLen; i++) {
+      const n1 = num1[num1.length - len + i - 1] || 0;
+      const n2 = num2[num2.length - len + i - 1] || 0;
+
+      num1Row.innerHTML += `<input type="text" disabled value="${n1}">`;
+      num2Row.innerHTML += `<input type="text" disabled value="${n2}">`;
+      answerRow.innerHTML += `<input type="text" id="ans-${i}" maxlength="1">`;
+      carryRow.innerHTML += `<input type="text" id="carry-${i}" maxlength="1">`;
+    }
+  }
+
+  function generateProblem() {
+    const length = Math.floor(Math.random() * 4) + 1;
+    num1 = generateDigits(length);
+    num2 = generateDigits(length);
+    document.getElementById('result').innerText = '';
+    document.getElementById('full-answer').innerText = '';
+    displayProblem();
+  }
+
+  function checkAnswer() {
+    let carry = 0;
+    let correct = true;
+    const len = Math.max(num1.length, num2.length);
+    const totalDigits = len + 1;
+    let correctAnswer = [];
+
+    for (let i = totalDigits - 1; i >= 0; i--) {
+      const n1 = num1[num1.length - 1 - (totalDigits - 1 - i)] || 0;
+      const n2 = num2[num2.length - 1 - (totalDigits - 1 - i)] || 0;
+
+      const expected = n1 + n2 + carry;
+      const expectedDigit = expected % 10;
+      carry = Math.floor(expected / 10);
+
+      correctAnswer.unshift(expectedDigit);
     }
 
-    function displayProblem() {
-      const len = Math.max(num1.length, num2.length);
-      const answerLen = len + 1;
+    // Skip leading zeros in validation
+    let leading = true;
+    for (let i = 0; i < totalDigits; i++) {
+      const ansInput = document.getElementById(`ans-${i}`);
+      const userDigitRaw = ansInput.value.trim();
+      const expectedDigit = correctAnswer[i];
 
-      const num1Row = document.getElementById('num1-row');
-      const num2Row = document.getElementById('num2-row');
-      const answerRow = document.getElementById('answer-row');
-      const carryRow = document.getElementById('carry-row');
-
-      num1Row.innerHTML = '';
-      num2Row.innerHTML = '';
-      answerRow.innerHTML = '';
-      carryRow.innerHTML = '';
-
-      for (let i = 0; i < answerLen; i++) {
-        const n1 = num1[num1.length - len + i - 1] || 0;
-        const n2 = num2[num2.length - len + i - 1] || 0;
-
-        num1Row.innerHTML += `<input type="text" disabled value="${n1}">`;
-        num2Row.innerHTML += `<input type="text" disabled value="${n2}">`;
-        answerRow.innerHTML += `<input type="text" id="ans-${i}" maxlength="1">`;
-        carryRow.innerHTML += `<input type="text" id="carry-${i}" maxlength="1" disabled>`;
-      }
-    }
-
-    function generateProblem() {
-      const length = Math.floor(Math.random() * 4) + 1;
-      num1 = generateDigits(length);
-      num2 = generateDigits(length);
-      document.getElementById('result').innerText = '';
-      document.getElementById('full-answer').innerText = '';
-      displayProblem();
-    }
-
-    function checkAnswer() {
-      let carry = 0;
-      let correct = true;
-      const len = Math.max(num1.length, num2.length);
-      const totalDigits = len + 1;
-      let correctAnswer = [];
-      let carryArray = new Array(totalDigits).fill(0);
-
-      for (let i = totalDigits - 1; i >= 0; i--) {
-        const n1 = num1[num1.length - 1 - (totalDigits - 1 - i)] || 0;
-        const n2 = num2[num2.length - 1 - (totalDigits - 1 - i)] || 0;
-
-        const expected = n1 + n2 + carry;
-        const expectedDigit = expected % 10;
-        carry = Math.floor(expected / 10);
-
-        correctAnswer.unshift(expectedDigit);
-
-        if (i > 0) carryArray[i - 1] = carry;
-
-        const ansInput = document.getElementById(`ans-${i}`);
-        const userDigit = parseInt(ansInput.value, 10);
-
-        if (isNaN(userDigit) || userDigit !== expectedDigit) {
+      if (leading && expectedDigit === 0) {
+        if (userDigitRaw !== '' && userDigitRaw !== '0') {
           correct = false;
         }
+        continue;
       }
 
-      for (let i = 0; i < totalDigits; i++) {
-        const carryInput = document.getElementById(`carry-${i}`);
-        carryInput.value = carryArray[i] > 0 ? carryArray[i] : '';
+      leading = false;
+      const userDigit = parseInt(userDigitRaw, 10);
+      if (isNaN(userDigit) || userDigit !== expectedDigit) {
+        correct = false;
       }
-
-      document.getElementById('result').innerText = correct ? '✅ Correct!' : '❌ Try Again!';
-      document.getElementById('full-answer').innerText = 'Correct Answer: ' + correctAnswer.join('');
     }
 
-    generateProblem();
-  </script>
+    document.getElementById('result').innerText = correct ? '✅ Correct!' : '❌ Try Again!';
+    document.getElementById('full-answer').innerText = 'Correct Answer: ' + correctAnswer.join('');
+  }
+
+  generateProblem();
+</script>
 </body>
 </html>
