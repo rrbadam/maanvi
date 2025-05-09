@@ -121,11 +121,11 @@
     let correctLetter = "";
     let attemptCount = 0;
 
-    window.speechSynthesis.onvoiceschanged = function() {
-            const voices = speechSynthesis.getVoices();
-            let voiceList = voices.map(v => `${v.name} (${v.lang})`).join('\n');
-            alert("Available voices:\n" + voiceList);
-        };
+    speechSynthesis.onvoiceschanged = function() {
+        const voices = speechSynthesis.getVoices();
+        alert("Available voices:\n" + voices.map(v => `${v.name} (${v.lang})`).join('\n'));
+    };
+
 
     function getRandomLetter() {
         const index = Math.floor(Math.random() * hindiLetters.length);
