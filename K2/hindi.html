@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hindi Letter Quiz (Random Feedback)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f0f8ff;
+            padding: 50px;
+        }
+        .option {
+            display: inline-block;
+            background: #fff;
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            padding: 20px 40px;
+            margin: 20px;
+            font-size: 32px;
+            cursor: pointer;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+            transition: background 0.3s;
+        }
+        .option:hover {
+            background: #d4f1f4;
+        }
+        button {
+            font-size: 20px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        table {
+            margin: 30px auto;
+            border-collapse: collapse;
+            width: 60%;
+            background: #fff;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 12px;
+            font-size: 18px;
+        }
+        th {
+            background: #d4f1f4;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🔊 Listen and Choose the Hindi Letter</h1>
+<button onclick="speakLetter()">🔊 Play Sound Again</button>
+
+<div id="options">
+    <!-- Options will appear here -->
+</div>
+
+<h2>Results</h2>
+<table id="resultsTable">
+    <tr>
+        <th>#</th>
+        <th>Letter Played</th>
+        <th>Selected Answer</th>
+        <th>Result</th>
+    </tr>
+</table>
+
+<script>
+    const hindiLetters = ["अ", "आ", "इ", "ई", "उ", "ऊ", "ए", "ऐ", "ओ", "औ", "क", "ख", "ग", "घ", "च", "छ", "ज", "झ", "ट", "ठ", "ड", "ढ", "त", "थ", "द", "ध", "न", "प", "फ", "ब", "भ", "म", "य", "र", "ल", "व", "श", "ष", "स", "ह"];
+
+    const positiveFeedback = [
+        "Awesome! You got it right!",
+        "Fantastic job! Keep it up!",
+        "Brilliant! You're doing great!",
+        "Wow! That’s perfect!",
+        "Hooray! You nailed it!",
+        "Superb! You're a star!",
+        "Yippee! You did it!",
+        "Excellent work! Proud of you!",
+        "Great choice! You’re rocking it!",
+        "Magnificent! Spot on!",
+        "High five! That’s correct!",
+        "Bravo! You’re amazing!",
+        "Terrific! You’re a champ!",
+        "Boom! Right on target!",
+        "You’re unstoppable! Well done!",
+        "Champion move! Keep going!",
+        "Fabulous! You got it spot on!",
+        "Splendid! Keep shining!",
+        "That’s genius! Great job!",
+        "Sweet! You’re crushing it!"
+    ];
+
+
+    const negativeFeedback = [
+        "Oops! That's not correct. Try again!",
+        "Not quite! Give it another shot!",
+        "Hmm, that's incorrect. Try once more!",
+        "Oh no! That's not it. Keep trying!",
+        "Almost there! Try again!",
+        "Close, but not quite. Try again!",
+        "Hmm… that’s not the right one. Don’t give up!",
+        "No worries! You’ll get it next time!",
+        "Keep going! You’re learning!",
+        "Oopsie! Give it another try!",
+        "Not this one! Look carefully and try again!",
+        "Hmm, that's a tricky one. Try once more!",
+        "Nice try! Let’s try again!",
+        "Don’t worry! Try again—you’ve got this!",
+        "Ah, not this time! Keep practicing!",
+        "That’s okay! Everyone makes mistakes. Try again!",
+        "Hmm… have another look and try again!",
+        "Almost cracked it! Give it one more go!",
+        "Nope! But you’re getting closer!",
+        "Oh snap! Not the right one. Try again!"
+    ];
+
+
+    let correctLetter = "";
+    let attemptCount = 0;
+
+    function getRandomLetter() {
+        const index = Math.floor(Math.random() * hindiLetters.length);
+        return hindiLetters[index];
+    }
+
+    function getRandomFeedback(feedbackArray) {
+        const index = Math.floor(Math.random() * feedbackArray.length);
+        return feedbackArray[index];
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function speakLetter() {
+        const utterance = new SpeechSynthesisUtterance(correctLetter);
+        utterance.lang = "hi-IN";
+        speechSynthesis.speak(utterance);
+    }
+
+    function generateOptions() {
+        correctLetter = getRandomLetter();
+
+        const optionsSet = new Set();
+        optionsSet.add(correctLetter);
+
+        while (optionsSet.size < 4) {
+            optionsSet.add(getRandomLetter());
+        }
+
+        const options = Array.from(optionsSet);
+        shuffleArray(options);
+
+        const optionsDiv = document.getElementById("options");
+        optionsDiv.innerHTML = ""; // Clear previous options
+
+        options.forEach(letter => {
+            const btn = document.createElement("div");
+            btn.className = "option";
+            btn.textContent = letter;
+            btn.onclick = () => checkAnswer(letter);
+            optionsDiv.appendChild(btn);
+        });
+
+        speakLetter();
+    }
+    function checkAnswer(selected) {
+        attemptCount++;
+        const isCorrect = selected === correctLetter;
+        const resultText = isCorrect ? "✅ Correct" : "❌ Wrong";
+
+        const feedbackMessage = isCorrect
+            ? getRandomFeedback(positiveFeedback)
+            : getRandomFeedback(negativeFeedback);
+
+        speak(feedbackMessage);
+
+        const table = document.getElementById("resultsTable");
+        const row = table.insertRow();
+        row.insertCell(0).textContent = attemptCount;
+        row.insertCell(1).textContent = correctLetter;
+        row.insertCell(2).textContent = selected;
+        row.insertCell(3).textContent = resultText;
+
+        if (isCorrect) {
+            // Delay next letter by 3 seconds
+            setTimeout(generateOptions, 3000);
+        }
+    }
+
+    function speak(text) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "en-US";
+        utterance.rate = 1;
+        speechSynthesis.speak(utterance);
+    }
+
+    window.onload = generateOptions;
+</script>
+
+</body>
+</html>
