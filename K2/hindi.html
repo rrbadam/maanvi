@@ -59,6 +59,8 @@
 <h1>🔊 Listen and Choose the Hindi Letter</h1>
 <button onclick="speakLetter()">🔊 Play Sound Again</button>
 
+<div id="feedback"></div>
+
 <div id="options">
     <!-- Options will appear here -->
 </div>
@@ -72,8 +74,6 @@
         <th>Result</th>
     </tr>
 </table>
-
-<div id="feedback"></div>
 
 <script>
     const letters = [
@@ -274,15 +274,15 @@
 
         speak(feedbackMessage);
 
+        const feedbackDiv = document.getElementById("feedback");
+        feedbackDiv.textContent = feedbackMessage;
+
         const table = document.getElementById("resultsTable");
-        const row = table.insertRow();
+        const row = table.insertRow(1); // Insert the row at position 1 (top of the table)
         row.insertCell(0).textContent = attemptCount;
         row.insertCell(1).textContent = correctLetter.letter;
         row.insertCell(2).textContent = selected.letter;
         row.insertCell(3).textContent = resultText;
-
-        const feedbackDiv = document.getElementById("feedback");
-        feedbackDiv.textContent = feedbackMessage;
 
         if (isCorrect) {
             // Delay next letter by 3 seconds
