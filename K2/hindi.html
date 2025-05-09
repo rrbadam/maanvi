@@ -121,6 +121,12 @@
     let correctLetter = "";
     let attemptCount = 0;
 
+    window.speechSynthesis.onvoiceschanged = function() {
+            const voices = speechSynthesis.getVoices();
+            let voiceList = voices.map(v => `${v.name} (${v.lang})`).join('\n');
+            alert("Available voices:\n" + voiceList);
+        };
+
     function getRandomLetter() {
         const index = Math.floor(Math.random() * hindiLetters.length);
         return hindiLetters[index];
