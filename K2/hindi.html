@@ -46,6 +46,12 @@
         th {
             background: #d4f1f4;
         }
+        #feedback {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -67,8 +73,51 @@
     </tr>
 </table>
 
+<div id="feedback"></div>
+
 <script>
-    const hindiLetters = ["अ", "आ", "इ", "ई", "उ", "ऊ", "ए", "ऐ", "ओ", "औ", "क", "ख", "ग", "घ", "च", "छ", "ज", "झ", "ट", "ठ", "ड", "ढ", "त", "थ", "द", "ध", "न", "प", "फ", "ब", "भ", "म", "य", "र", "ल", "व", "श", "ष", "स", "ह"];
+    const letters = [
+        { letter: "अ", roman: "A" },
+        { letter: "आ", roman: "AA" },
+        { letter: "इ", roman: "I" },
+        { letter: "ई", roman: "II" },
+        { letter: "उ", roman: "U" },
+        { letter: "ऊ", roman: "UU" },
+        { letter: "ए", roman: "E" },
+        { letter: "ऐ", roman: "AI" },
+        { letter: "ओ", roman: "O" },
+        { letter: "औ", roman: "AU" },
+        { letter: "क", roman: "KA" },
+        { letter: "ख", roman: "KHA" },
+        { letter: "ग", roman: "GA" },
+        { letter: "घ", roman: "GHA" },
+        { letter: "च", roman: "CHA" },
+        { letter: "छ", roman: "CHHA" },
+        { letter: "ज", roman: "JA" },
+        { letter: "झ", roman: "JHA" },
+        { letter: "ट", roman: "TA" },
+        { letter: "ठ", roman: "THA" },
+        { letter: "ड", roman: "DA" },
+        { letter: "ढ", roman: "DHA" },
+        { letter: "त", roman: "TA" },
+        { letter: "थ", roman: "THA" },
+        { letter: "द", roman: "DA" },
+        { letter: "ध", roman: "DHA" },
+        { letter: "न", roman: "NA" },
+        { letter: "प", roman: "PA" },
+        { letter: "फ", roman: "PHA" },
+        { letter: "ब", roman: "BA" },
+        { letter: "भ", roman: "BHA" },
+        { letter: "म", roman: "MA" },
+        { letter: "य", roman: "YA" },
+        { letter: "र", roman: "RA" },
+        { letter: "ल", roman: "LA" },
+        { letter: "व", roman: "VA" },
+        { letter: "श", roman: "SHA" },
+        { letter: "ष", roman: "SSHA" },
+        { letter: "स", roman: "SA" },
+        { letter: "ह", roman: "HA" }
+    ];
 
     const positiveFeedback = [
         "Awesome! You got it right!",
@@ -93,7 +142,6 @@
         "Sweet! You’re crushing it!"
     ];
 
-
     const negativeFeedback = [
         "Oops! That's not correct. Try again!",
         "Not quite! Give it another shot!",
@@ -117,24 +165,56 @@
         "Oh snap! Not the right one. Try again!"
     ];
 
-
     let correctLetter = "";
     let attemptCount = 0;
 
-    function logToPage(message) {
-        const logDiv = document.createElement('div');
-        logDiv.textContent = message;
-        document.body.appendChild(logDiv);
+    // Helper function to speak the correct Romanized sound
+    function getRomanSound(roman) {
+        const romanSounds = {
+            "KA": "ka",
+            "KHA": "kha",
+            "GA": "ga",
+            "GHA": "gha",
+            "CHA": "cha",
+            "CHHA": "chha",
+            "JA": "ja",
+            "JHA": "jha",
+            "TA": "ta",
+            "THA": "tha",
+            "DA": "da",
+            "DHA": "dha",
+            "NA": "na",
+            "PA": "pa",
+            "PHA": "pha",
+            "BA": "ba",
+            "BHA": "bha",
+            "MA": "ma",
+            "YA": "ya",
+            "RA": "ra",
+            "LA": "la",
+            "VA": "va",
+            "SHA": "sha",
+            "SSHA": "ssha",
+            "SA": "sa",
+            "HA": "ha",
+            "A": "a",
+            "AA": "aa",
+            "I": "i",
+            "II": "ii",
+            "U": "u",
+            "UU": "uu",
+            "E": "e",
+            "AI": "ai",
+            "O": "o",
+            "AU": "au"
+        };
+
+        return romanSounds[roman] || roman;
     }
 
-    speechSynthesis.onvoiceschanged = function() {
-        const voices = speechSynthesis.getVoices();
-        logToPage("Available voices:\n" + voices.map(v => `${v.name} (${v.lang})`).join('\n'));
-    };
-
     function getRandomLetter() {
-        const index = Math.floor(Math.random() * hindiLetters.length);
-        return hindiLetters[index];
+        const index = Math.floor(Math.random() * letters.length);
+        return letters[index];
     }
 
     function getRandomFeedback(feedbackArray) {
@@ -150,8 +230,9 @@
     }
 
     function speakLetter() {
-        const utterance = new SpeechSynthesisUtterance(correctLetter);
-        utterance.lang = "hi-IN";
+        const romanSound = getRomanSound(correctLetter.roman);
+        const utterance = new SpeechSynthesisUtterance(romanSound);
+        utterance.lang = "en-US";
         speechSynthesis.speak(utterance);
     }
 
@@ -171,16 +252,17 @@
         const optionsDiv = document.getElementById("options");
         optionsDiv.innerHTML = ""; // Clear previous options
 
-        options.forEach(letter => {
+        options.forEach(letterObj => {
             const btn = document.createElement("div");
             btn.className = "option";
-            btn.textContent = letter;
-            btn.onclick = () => checkAnswer(letter);
+            btn.textContent = letterObj.letter;
+            btn.onclick = () => checkAnswer(letterObj);
             optionsDiv.appendChild(btn);
         });
 
         speakLetter();
     }
+
     function checkAnswer(selected) {
         attemptCount++;
         const isCorrect = selected === correctLetter;
@@ -195,9 +277,12 @@
         const table = document.getElementById("resultsTable");
         const row = table.insertRow();
         row.insertCell(0).textContent = attemptCount;
-        row.insertCell(1).textContent = correctLetter;
-        row.insertCell(2).textContent = selected;
+        row.insertCell(1).textContent = correctLetter.letter;
+        row.insertCell(2).textContent = selected.letter;
         row.insertCell(3).textContent = resultText;
+
+        const feedbackDiv = document.getElementById("feedback");
+        feedbackDiv.textContent = feedbackMessage;
 
         if (isCorrect) {
             // Delay next letter by 3 seconds
