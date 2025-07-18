@@ -1,114 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
-    <meta charset="UTF-8" />
-    <title>Hindi Swar & Vyanjan Quiz</title>
+    <meta charset="UTF-8">
+    <title>Hindi Svar & Vyanjan Quiz</title>
     <style>
         body {
           font-family: Arial, sans-serif;
           padding: 20px;
-          background: #f2f2f2;
+          background-color: #f2f2f2;
         }
-        .container {
-          max-width: 800px;
+        .quiz-box {
           background: white;
           padding: 20px;
-          border-radius: 12px;
-          box-shadow: 0 0 10px #ccc;
+          border-radius: 10px;
+          max-width: 700px;
           margin: auto;
-        }
-        select, button {
-          font-size: 18px;
-          padding: 8px 12px;
-          margin: 10px 0;
+          box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         .question {
-          font-size: 32px;
-          margin: 20px 0;
+          font-size: 30px;
+          margin-bottom: 20px;
+          color: blue;
           text-align: center;
         }
         .options {
           display: flex;
           flex-wrap: wrap;
           justify-content: center;
-          margin-bottom: 10px;
         }
         .options button {
+          padding: 10px 20px;
           margin: 5px;
-          font-size: 22px;
-          padding: 10px 16px;
+          font-size: 24px;
           cursor: pointer;
         }
         .feedback {
-          text-align: center;
+          margin-top: 20px;
           font-size: 22px;
-          margin-top: 10px;
+          font-weight: bold;
+          text-align: center;
         }
         .next-btn {
-          display: block;
-          margin: 20px auto;
+          margin-top: 20px;
           font-size: 20px;
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
         }
-        .score {
-          font-size: 22px;
-          text-align: center;
-          margin-top: 10px;
-        }
-        .filled {
-          padding: 0 10px;
-          font-weight: bold;
-        }
-        .correct { color: green; }
-        .wrong { color: red; }
-        table {
+        .result-table {
+          margin-top: 40px;
           width: 100%;
-          margin-top: 30px;
           border-collapse: collapse;
         }
-        th, td {
+        .result-table th, .result-table td {
           border: 1px solid #ccc;
           padding: 8px;
           text-align: center;
-          font-size: 18px;
         }
-        th { background: #eee; }
+        .mode-buttons {
+          text-align: center;
+          margin-bottom: 20px;
+        }
+        .mode-buttons button {
+          margin: 5px;
+          font-size: 18px;
+          padding: 8px 16px;
+          cursor: pointer;
+        }
+        .correct { color: green; font-weight: bold; }
+        .wrong { color: red; font-weight: bold; }
     </style>
 </head>
 <body>
-<div class="container">
-    <h2>Hindi Swar & Vyanjan Quiz</h2>
-    <label>Select Mode:
-        <select id="modeSelect">
-            <option value="beforeafter">Before / After</option>
-            <option value="sequence">Sequence Fill</option>
-        </select>
-    </label>
-    <div class="question" id="question">Question will appear here</div>
-
-    <div class="options" id="options1"></div>
-    <div class="options" id="options2" style="display:none;"></div>
-
-    <div class="feedback" id="feedback"></div>
-    <button class="next-btn" onclick="generateQuestion()">Next</button>
-
-    <div class="score" id="score">Score: 0</div>
-
-    <table>
-        <thead>
-        <tr>
-            <th>Question</th>
-            <th>Your Answer</th>
-            <th>Correct Answer</th>
-            <th>Result</th>
-        </tr>
-        </thead>
-        <tbody id="resultsTable"></tbody>
-    </table>
+<div class="mode-buttons" id="modeSelection">
+    <button onclick="startQuiz('beforeAfter')">🔁 Before / After</button>
+    <button onclick="startQuiz('sequence')">🔤 Sequence Fill</button>
 </div>
 
-<!-- Audio -->
-<audio id="correctSound" src="https://www.soundjay.com/buttons/sounds/button-4.mp3" preload="auto"></audio>
-<audio id="wrongSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3" preload="auto"></audio>
+<div class="quiz-box">
+    <div class="question" id="question">Choose a mode above to begin!</div>
+    <div class="options" id="options1"></div>
+    <div class="options" id="options2"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" onclick="generateQuestion()">Next</button>
+</div>
+
+<table class="result-table" id="resultsTable">
+    <thead>
+    <tr><th>#</th><th>Question</th><th>Your Answer</th><th>Result</th></tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<!-- Sounds -->
+<audio id="correctSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_222780b9bb.mp3?filename=correct-answer-2-6297.mp3"></audio>
+<audio id="wrongSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8ce21f8.mp3?filename=negative_beeps-6008.mp3"></audio>
 
 <script>
     const swar = ["अ", "आ", "इ", "ई", "उ", "ऊ", "ऋ", "ए", "ऐ", "ओ", "औ", "अं", "अः"];
@@ -117,117 +103,142 @@
       "ट", "ठ", "ड", "ढ", "ण", "त", "थ", "द", "ध", "न",
       "प", "फ", "ब", "भ", "म", "य", "र", "ल", "व", "श", "ष", "स", "ह", "ळ"
     ];
-
-    let score = 0;
-    let currentQuestion = "";
+    const allLetters = swar.concat(vyanjan);
+    let currentMode = '';
     let correctAnswers = [];
-    let filledAnswers = [];
-    let currentLetterSet = [];
+    let blankIndices = [];
+    let currentSequence = [];
+    let questionText = '';
+    let totalQuestions = 0;
 
-    const questionBox = document.getElementById("question");
-    const optionsBox1 = document.getElementById("options1");
-    const optionsBox2 = document.getElementById("options2");
-    const feedbackBox = document.getElementById("feedback");
-    const scoreBox = document.getElementById("score");
-    const resultsTable = document.getElementById("resultsTable");
-    const modeSelect = document.getElementById("modeSelect");
-    const correctSound = document.getElementById("correctSound");
-    const wrongSound = document.getElementById("wrongSound");
+    function getRandomInt(max) {
+      return Math.floor(Math.random() * max);
+    }
 
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = getRandomInt(i + 1);
         [array[i], array[j]] = [array[j], array[i]];
       }
       return array;
     }
 
-    function addResult(question, yourAns, correctAns, result) {
-      const row = document.createElement("tr");
-      row.innerHTML = `<td>${question}</td><td>${yourAns}</td><td>${correctAns}</td><td>${result ? "✔" : "✘"}</td>`;
-      resultsTable.appendChild(row);
+    function startQuiz(mode) {
+      currentMode = mode;
+      generateQuestion();
     }
 
     function generateQuestion() {
-      feedbackBox.textContent = "";
-      optionsBox1.innerHTML = "";
-      optionsBox2.innerHTML = "";
-      optionsBox2.style.display = "none";
-      filledAnswers = [];
-      const mode = modeSelect.value;
-      currentLetterSet = Math.random() < 0.5 ? swar : vyanjan;
+      document.getElementById('feedback').innerText = '';
+      document.getElementById('options1').innerHTML = '';
+      document.getElementById('options2').innerHTML = '';
+      correctAnswers = [];
+      blankIndices = [];
+      questionText = '';
 
-      if (mode === "beforeafter") {
-        const idx = 1 + Math.floor(Math.random() * (currentLetterSet.length - 2));
-        const direction = Math.random() < 0.5 ? "before" : "after";
-        const target = currentLetterSet[idx];
-        const answer = direction === "before" ? currentLetterSet[idx - 1] : currentLetterSet[idx + 1];
-        correctAnswers = [answer];
-        currentQuestion = direction === "before" ? `___ <span class="filled">${target}</span>` : `<span class="filled">${target}</span> ___`;
-        questionBox.innerHTML = currentQuestion;
+      const letterSet = Math.random() < 0.5 ? swar : vyanjan;
+      const total = letterSet.length;
 
-        const options = shuffle([answer, ...Array(9).fill().map(() => currentLetterSet[Math.floor(Math.random() * currentLetterSet.length)])]);
-        options.forEach(opt => {
+      if (currentMode === 'sequence') {
+        const seqLength = 3 + getRandomInt(2);
+        const startIdx = getRandomInt(total - seqLength);
+        currentSequence = letterSet.slice(startIdx, startIdx + seqLength);
+
+        let missingCount = 1 + getRandomInt(Math.min(2, seqLength - 1));
+        blankIndices = shuffle([...Array(seqLength).keys()]).slice(0, missingCount);
+        correctAnswers = blankIndices.map(i => currentSequence[i]);
+
+        let displaySeq = currentSequence.map((l, i) => blankIndices.includes(i) ? '___' : l);
+        questionText = displaySeq.join('  ');
+        document.getElementById('question').innerText = questionText;
+
+        // First set of options
+        const opts1 = shuffle(
+          [correctAnswers[0], ...Array(9).fill().map(() => letterSet[getRandomInt(total)])]
+        );
+        opts1.forEach(opt => {
           const btn = document.createElement("button");
-          btn.textContent = opt;
-          btn.onclick = () => handleAnswer([opt]);
-          optionsBox1.appendChild(btn);
+          btn.innerText = opt;
+          btn.onclick = () => handleAnswer(opt, 0, letterSet);
+          document.getElementById("options1").appendChild(btn);
         });
+
+        if (correctAnswers.length === 2) {
+          const opts2 = shuffle(
+            [correctAnswers[1], ...Array(9).fill().map(() => letterSet[getRandomInt(total)])]
+          );
+          opts2.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.innerText = opt;
+            btn.onclick = () => handleAnswer(opt, 1, letterSet);
+            document.getElementById("options2").appendChild(btn);
+          });
+        }
 
       } else {
-        const seqLength = 3 + Math.floor(Math.random() * 2); // 3 or 4
-        const start = Math.floor(Math.random() * (currentLetterSet.length - seqLength));
-        const sequence = currentLetterSet.slice(start, start + seqLength);
-        const missingCount = Math.random() < 0.5 ? 1 : 2;
-        let blanks = shuffle([...Array(seqLength).keys()]).slice(0, missingCount).sort((a, b) => a - b);
-        correctAnswers = blanks.map(i => sequence[i]);
+        const idx = 1 + getRandomInt(total - 2);
+        const direction = Math.random() < 0.5 ? 'before' : 'after';
+        const target = letterSet[idx];
+        const answer = direction === 'before' ? letterSet[idx - 1] : letterSet[idx + 1];
+        correctAnswers = [answer];
 
-        let display = sequence.map((ch, i) => blanks.includes(i) ? `<span id="blank${i}">___</span>` : `<span class="filled">${ch}</span>`).join("  ");
-        questionBox.innerHTML = display;
+        if (direction === 'before') {
+          questionText = `___  ${target}`;
+        } else {
+          questionText = `${target}  ___`;
+        }
+        blankIndices = [direction === 'before' ? 0 : 1];
+        document.getElementById('question').innerText = questionText;
 
-        blanks.forEach((bIdx, setIdx) => {
-          const optBox = setIdx === 0 ? optionsBox1 : optionsBox2;
-          if (setIdx === 1) optionsBox2.style.display = "flex";
-          const ans = correctAnswers[setIdx];
-          const opts = shuffle([ans, ...Array(9).fill().map(() => currentLetterSet[Math.floor(Math.random() * currentLetterSet.length)])]);
-          opts.forEach(opt => {
-            const btn = document.createElement("button");
-            btn.textContent = opt;
-            btn.onclick = () => handleMultiAnswer(setIdx, opt, bIdx);
-            optBox.appendChild(btn);
-          });
+        const opts = shuffle(
+          [answer, ...Array(9).fill().map(() => letterSet[getRandomInt(total)])]
+        );
+        opts.forEach(opt => {
+          const btn = document.createElement("button");
+          btn.innerText = opt;
+          btn.onclick = () => handleAnswer(opt, 0, letterSet);
+          document.getElementById("options1").appendChild(btn);
         });
       }
     }
 
-    function handleAnswer(selected) {
-      const isCorrect = selected[0] === correctAnswers[0];
-      const colorClass = isCorrect ? "correct" : "wrong";
-      questionBox.innerHTML = questionBox.innerHTML.replace("___", `<span class="filled ${colorClass}">${selected[0]}</span>`);
-      feedbackBox.textContent = isCorrect ? "✅ Correct!" : `❌ Wrong! Correct Answer: ${correctAnswers[0]}`;
-      isCorrect ? correctSound.play() : wrongSound.play();
-      if (isCorrect) score++;
-      scoreBox.textContent = `Score: ${score}`;
-      addResult(questionBox.innerText, selected[0], correctAnswers[0], isCorrect);
-    }
+    let userSelections = [];
 
-    function handleMultiAnswer(index, selected, blankIndex) {
+    function handleAnswer(selected, index, letterSet) {
+      if (!userSelections[index]) userSelections[index] = { selected: null, isCorrect: false };
+      if (userSelections[index].selected !== null) return;
+
       const isCorrect = selected === correctAnswers[index];
-      const colorClass = isCorrect ? "correct" : "wrong";
-      document.getElementById(`blank${blankIndex}`).innerHTML = `<span class="filled ${colorClass}">${selected}</span>`;
-      filledAnswers[index] = { val: selected, correct: isCorrect };
+      userSelections[index] = { selected, isCorrect };
 
-      if (filledAnswers.filter(Boolean).length === correctAnswers.length) {
-        const allCorrect = filledAnswers.every(f => f.correct);
-        feedbackBox.textContent = allCorrect ? "✅ Correct!" : `❌ Wrong! Correct: ${correctAnswers.join(", ")}`;
-        if (allCorrect) score++;
-        allCorrect ? correctSound.play() : wrongSound.play();
-        scoreBox.textContent = `Score: ${score}`;
-        addResult(questionBox.innerText, filledAnswers.map(f => f.val).join(", "), correctAnswers.join(", "), allCorrect);
+      // Update the display
+      const parts = questionText.split('  ');
+      const colored = `<span class="${isCorrect ? 'correct' : 'wrong'}">${selected}</span>`;
+      parts[blankIndices[index]] = colored;
+      document.getElementById('question').innerHTML = parts.join('  ');
+
+      if (isCorrect) {
+        document.getElementById('correctSound').play();
+        document.getElementById('feedback').innerText = "Yay! You nailed it! 🎉";
+      } else {
+        document.getElementById('wrongSound').play();
+        document.getElementById('feedback').innerText = "Oops! Not quite right 😅";
+      }
+
+      // Add to result table if all answers attempted
+      if (userSelections.filter(u => u.selected !== null).length === correctAnswers.length) {
+        totalQuestions++;
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${totalQuestions}</td>
+          <td>${questionText.replace(/<[^>]*>/g, '')}</td>
+          <td>${userSelections.map(u => u.selected).join(', ')}</td>
+          <td>${userSelections.every(u => u.isCorrect) ? '✅' : '❌'}</td>
+        `;
+        document.querySelector("#resultsTable tbody").appendChild(row);
+        userSelections = [];
       }
     }
-
-    window.onload = generateQuestion;
 </script>
 </body>
 </html>
