@@ -57,7 +57,7 @@
 <body>
 
 <h1>🔊 Listen and Choose the Hindi Letter</h1>
-<button onclick="speakLetter()">🔊 Play Sound Again</button>
+<button onclick="speakLetter()" id="playSound">🔊 Play Sound Again</button>
 
 <div id="feedback"></div>
 
@@ -78,54 +78,54 @@
 <script>
     const letters = [
         { letter: "अ",roman:"uh"},
-{ letter: "आ",roman:"aa"},
-{ letter: "इ",roman:"i"},
-{ letter: "ई",roman:"ee"},
-{ letter: "उ",roman:"u"},
-{ letter: "ऊ",roman:"oo"},
-{ letter: "ऋ",roman:"ri"},
-{ letter: "ए",roman:"ay"},
-{ letter: "ऐ",roman:"ai"},
-{ letter: "ओ",roman:"oh"},
-{ letter: "औ",roman:"aow"},
-{ letter: "अं",roman:"ang"},
-{ letter: "अः",roman:"aha"},
-{ letter: "क",roman:"ka"},
-{ letter: "ख",roman:"kha"},
-{ letter: "ग",roman:"ga"},
-{ letter: "घ",roman:"gha"},
-{ letter: "ङ",roman:"nga"},
-{ letter: "च",roman:"cha"},
-{ letter: "छ",roman:"chha"},
-{ letter: "ज",roman:"ja"},
-{ letter: "झ",roman:"jha"},
-{ letter: "ञ",roman:"nya"},
-{ letter: "ट",roman:"ta"},
-{ letter: "ठ",roman:"tha"},
-{ letter: "ड",roman:"da"},
-{ letter: "ढ",roman:"dha"},
-{ letter: "ण",roman:"na"},
-{ letter: "त",roman:"tha"},
-{ letter: "थ",roman:"thha"},
-{ letter: "द",roman:"dha"},
-{ letter: "ध",roman:"dhha"},
-{ letter: "न",roman:"na"},
-{ letter: "प",roman:"pa"},
-{ letter: "फ",roman:"pha"},
-{ letter: "ब",roman:"ba"},
-{ letter: "भ",roman:"bha"},
-{ letter: "म",roman:"ma"},
-{ letter: "य",roman:"ya"},
-{ letter: "र",roman:"ra"},
-{ letter: "ल",roman:"la"},
-{ letter: "व",roman:"va"},
-{ letter: "श",roman:"sha"},
-{ letter: "ष",roman:"ssa"},
-{ letter: "स",roman:"sa"},
-{ letter: "ह",roman:"ha"},
-{ letter: "क्ष",roman:"ksha"},
-{ letter: "त्र",roman:"tra"},
-{ letter: "ज्ञ",roman:"gya"}
+        { letter: "आ",roman:"aa"},
+        { letter: "इ",roman:"i"},
+        { letter: "ई",roman:"ee"},
+        { letter: "उ",roman:"u"},
+        { letter: "ऊ",roman:"oo"},
+        { letter: "ऋ",roman:"ri"},
+        { letter: "ए",roman:"ay"},
+        { letter: "ऐ",roman:"ai"},
+        { letter: "ओ",roman:"oh"},
+        { letter: "औ",roman:"aow"},
+        { letter: "अं",roman:"ang"},
+        { letter: "अः",roman:"aha"},
+        { letter: "क",roman:"ka"},
+        { letter: "ख",roman:"kha"},
+        { letter: "ग",roman:"ga"},
+        { letter: "घ",roman:"gha"},
+        { letter: "ङ",roman:"nga"},
+        { letter: "च",roman:"cha"},
+        { letter: "छ",roman:"chha"},
+        { letter: "ज",roman:"ja"},
+        { letter: "झ",roman:"jha"},
+        { letter: "ञ",roman:"nya"},
+        { letter: "ट",roman:"ta"},
+        { letter: "ठ",roman:"tha"},
+        { letter: "ड",roman:"da"},
+        { letter: "ढ",roman:"dha"},
+        { letter: "ण",roman:"na"},
+        { letter: "त",roman:"tha"},
+        { letter: "थ",roman:"thha"},
+        { letter: "द",roman:"dha"},
+        { letter: "ध",roman:"dhha"},
+        { letter: "न",roman:"na"},
+        { letter: "प",roman:"pa"},
+        { letter: "फ",roman:"pha"},
+        { letter: "ब",roman:"ba"},
+        { letter: "भ",roman:"bha"},
+        { letter: "म",roman:"ma"},
+        { letter: "य",roman:"ya"},
+        { letter: "र",roman:"ra"},
+        { letter: "ल",roman:"la"},
+        { letter: "व",roman:"va"},
+        { letter: "श",roman:"sha"},
+        { letter: "ष",roman:"ssa"},
+        { letter: "स",roman:"sa"},
+        { letter: "ह",roman:"ha"},
+        { letter: "क्ष",roman:"ksha"},
+        { letter: "त्र",roman:"tra"},
+        { letter: "ज्ञ",roman:"gya"}
     ];
 
     const positiveFeedback = [
@@ -258,6 +258,8 @@
         const options = Array.from(optionsSet);
         shuffleArray(options);
 
+        const playSound = document.getElementById("playSound");
+         playSound.textContent = "Play Sound now --> " + correctLetter.roman;
         const optionsDiv = document.getElementById("options");
         optionsDiv.innerHTML = ""; // Clear previous options
 
