@@ -110,6 +110,8 @@
             </thead>
             <tbody id="resultsTableBody"></tbody>
         </table>
+        <button onclick="startAgain()">🔄 Start Again</button>
+        <button onclick="resetPage()">♻️ Reset</button>
     </div>
 </div>
 
@@ -170,7 +172,7 @@
       document.getElementById('resultsTableBody').appendChild(row);
     }
 
-    function checkSpelling() {
+        function checkSpelling() {
       const input = document.getElementById('spellingInput').value.trim().toLowerCase();
       const correctWord = words[currentIndex].toLowerCase();
       const feedback = document.getElementById('feedback');
@@ -194,6 +196,23 @@
         speak("Wrong. The word is " + words[currentIndex]);
         wrongAttemptCount++;
       }
+    }
+
+    function startAgain() {
+      // Clear results table
+      document.getElementById('resultsTableBody').innerHTML = '';
+      // Reset index and wrong attempt counter
+      currentIndex = 0;
+      wrongAttemptCount = 0;
+      // Clear feedback
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('spellingInput').value = '';
+      // Start from the first word again
+      playWord();
+    }
+    function resetPage() {
+      // Reload the page completely
+      location.reload();
     }
 </script>
 
