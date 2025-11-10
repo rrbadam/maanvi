@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spelling Practice</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS','Arial', sans-serif;
+            padding: 20px;
+            background: linear-gradient(to bottom, #fceabb, #f8b500);
+            text-align: center;
+        }
+        h1 {
+            color: #fff;
+            text-shadow: 2px 2px 4px #444;
+            font-size: 3rem;
+        }
+        .hidden { display: none; }
+        textarea, input[type=text] {
+            font-size: 1.2rem;
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #ff9900;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        }
+        button {
+            padding: 12px 24px;
+            margin-top: 10px;
+            font-size: 1.2rem;
+            border: none;
+            background-color: #ff6600;
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 2px 4px #cc5200;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        button:hover {
+            background-color: #ff8533;
+            transform: scale(1.05);
+        }
+        #feedback {
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 1.5rem;
+        }
+        .correct { color: green; animation: pop 0.3s ease; }
+        .wrong { color: red; animation: shake 0.3s ease; }
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        table {
+            border-collapse: collapse;
+            margin: 20px auto;
+            width: 80%;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        table, th, td { border: none; }
+        th {
+            background-color: #ffcc66;
+            padding: 10px;
+            font-size: 1.2rem;
+            color: #333;
+        }
+        td {
+            padding: 10px;
+            font-size: 1.1rem;
+        }
+        tr:nth-child(even) td {
+            background-color: #fff8e1;
+        }
+    </style>
+</head>
+<body>
+
+<h1>📝 Spelling Practice</h1>
+
+<div id="wordInputSection">
+    <p style="font-size:1.2rem;color:#fff;">Enter words separated by commas:</p>
+    <textarea id="wordList" rows="5"></textarea><br>
+    <button onclick="startPractice()">🚀 Start Practice</button>
+</div>
+
+<div id="practiceSection" class="hidden">
+    <p style="font-size:1.3rem;">Listen to the word and type its spelling:</p>
+    <button onclick="playWord()">🔊 Play Word</button><br><br>
+    <input type="text" id="spellingInput" placeholder="Type here"/>
+    <button onclick="checkSpelling()">✅ Check</button>
+    <div id="feedback"></div>
+
+    <!-- Results table -->
+    <div id="resultsSection">
+        <h3 style="color:#fff;text-shadow:1px 1px 2px #444;">📋 Results</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Word</th>
+                <th>Wrong Attempts Before Success</th>
+            </tr>
+            </thead>
+            <tbody id="resultsTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    let words = [];
+    let currentIndex = 0;
+    let voice = null;
+    let wrongAttemptCount = 0;
+
+    function loadVoices() {
+      const voices = speechSynthesis.getVoices();
+      voice = voices.find(v => v.lang.includes('en-IN')) || voices[0];
+    }
+    speechSynthesis.onvoiceschanged = loadVoices;
+
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      if (voice) utterance.voice = voice;
+      speechSynthesis.speak(utterance);
+    }
+
+    // Shuffle helper
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function startPractice() {
+      const inputText = document.getElementById('wordList').value.trim();
+      if (!inputText) {
+        alert("Please enter some words!");
+        return;
+      }
+      words = inputText.split(',').map(w => w.trim()).filter(w => w.length > 0);
+      if (words.length === 0) {
+        alert("No valid words!");
+        return;
+      }
+
+      shuffleArray(words); // 🔀 now words are in random order
+
+      currentIndex = 0;
+      wrongAttemptCount = 0;
+      document.getElementById('wordInputSection').classList.add('hidden');
+      document.getElementById('practiceSection').classList.remove('hidden');
+      playWord();
+    }
+
+    function playWord() {
+      speak(words[currentIndex]);
+    }
+
+    function addResultRow(word, wrongTries) {
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${word}</td><td>${wrongTries}</td>`;
+      document.getElementById('resultsTableBody').appendChild(row);
+    }
+
+    function checkSpelling() {
+      const input = document.getElementById('spellingInput').value.trim().toLowerCase();
+      const correctWord = words[currentIndex].toLowerCase();
+      const feedback = document.getElementById('feedback');
+      if (input === correctWord) {
+        feedback.textContent = "🎉 Correct!";
+        feedback.className = "correct";
+        speak("Correct!");
+        addResultRow(words[currentIndex], wrongAttemptCount);
+        currentIndex++;
+        wrongAttemptCount = 0;
+        if (currentIndex < words.length) {
+          document.getElementById('spellingInput').value = '';
+          setTimeout(playWord, 1500);
+        } else {
+          feedback.textContent = "🏆 All words completed!";
+          speak("Well done! All words completed!");
+        }
+      } else {
+        feedback.textContent = "❌ Wrong, try again!";
+        feedback.className = "wrong";
+        speak("Wrong. The word is " + words[currentIndex]);
+        wrongAttemptCount++;
+      }
+    }
+</script>
+
+</body>
+</html>
